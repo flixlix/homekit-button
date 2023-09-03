@@ -27,12 +27,12 @@ switch:
           service: input_number.set_value
           data:
             entity_id: input_number.test
-            value: '255'
+            value: "255"
         turn_off:
           service: input_number.set_value
           data:
             entity_id: input_number.test
-            value: '0'
+            value: "0"
 
 sensor:
   - platform: template
@@ -42,16 +42,16 @@ sensor:
         unit_of_measurement: Kb/s
       raspi_cpu:
         value_template: "{{ ((states('input_number.test') | int) / 255 * 100) | int }}"
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       raspi_ram:
         value_template: "{{ ((states('input_number.test') | int) / 255 * 100) | int }}"
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       raspi_sd:
         value_template: "{{ ((states('input_number.test') | int) / 255 * 100) | int }}"
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       raspi_temp:
         value_template: "{{ ((states('input_number.test') | int) / 255 * 100) | int }}"
-        unit_of_measurement: '°C'
+        unit_of_measurement: "°C"
 
 binary_sensor:
   - platform: template
@@ -65,23 +65,23 @@ light:
   - platform: template
     lights:
       test_light:
-        friendly_name: 'Test Light'
-        level_template: '{{ states.sensor.sensor1.state | int }}'
-        value_template: '{{ states.sensor.sensor1.state | int > 0 }}'
+        friendly_name: "Test Light"
+        level_template: "{{ states.sensor.sensor1.state | int }}"
+        value_template: "{{ states.sensor.sensor1.state | int > 0 }}"
         turn_on:
           service: input_number.set_value
           data:
             entity_id: input_number.test
-            value: '255'
+            value: "255"
         turn_off:
           service: input_number.set_value
           data:
             entity_id: input_number.test
-            value: '0'
+            value: "0"
         set_level:
           service: input_number.set_value
           data_template:
-            value: '{{ brightness }}'
+            value: "{{ brightness }}"
 
 alarm_control_panel:
   - platform: manual
@@ -98,6 +98,6 @@ alarm_control_panel:
 
 timer:
   laundry:
-    duration: '01:00:10'
+    duration: "01:00:10"
 
 stream:

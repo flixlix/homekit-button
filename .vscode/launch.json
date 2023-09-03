@@ -12,7 +12,9 @@
       "webRoot": "${workspaceFolder}/dist",
       "preLaunchTask": "debug",
       "postDebugTask": "devcontainer: stop debug",
-      "skipFiles": ["**/frontend_latest/**"]
+      "skipFiles": [
+        "**/frontend_latest/**"
+      ]
     }
   ]
 }
