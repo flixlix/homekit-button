@@ -1,4 +1,9 @@
-# Homekit Button
+[![ko-fi support](https://img.shields.io/badge/support-me-ff5e5b?style=flat-square&logo=ko-fi&label=Support%20My%20Work&logo=none)](https://ko-fi.com/flixlix)
+![GitHub all releases](https://img.shields.io/github/downloads/flixlix/homekit-button/total?style=flat-square&label=Total%20Downloads)
+![commit_activity](https://img.shields.io/github/commit-activity/y/flixlix/homekit-button?color=brightgreen&label=Commits&style=flat-square)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/flixlix/homekit-button?style=flat-square&label=Latest%20Release)
+
+# Homekit Button 🔘
 
 A simple Custom Card for Home Assistant to toggle switches, lights &amp; more!
 This card focuses on ease of configuration and stability.
