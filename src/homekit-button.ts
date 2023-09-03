@@ -1,7 +1,7 @@
 import { LitElement, PropertyValues, TemplateResult, html } from "lit";
 import { customElement, eventOptions, property, queryAsync, state } from "lit/decorators.js";
 import { registerCustomCard } from "./utils/register-custom-card";
-import { HomeAssistant, handleAction } from "custom-card-helpers";
+import { EntityConfig, HomeAssistant, LovelaceCardEditor, handleAction } from "custom-card-helpers";
 import { styles } from "./style";
 import { HomekitButtonConfig } from "./homekit-button-config";
 import { HassEntity } from "home-assistant-js-websocket";
@@ -10,6 +10,7 @@ import { RippleHandlers } from "@material/mwc-ripple/ripple-handlers";
 import copy from "fast-copy";
 import { styleMap } from "lit-html/directives/style-map";
 import { actionHandler } from "./action-handler";
+import "./ui-editor/ui-editor";
 
 registerCustomCard({
   type: "homekit-button",
@@ -27,6 +28,29 @@ export class HomekitButton extends LitElement {
       throw new Error("Please define at least one entity");
     }
     this._config = config;
+  }
+
+  static getStubConfig(hass: HomeAssistant): object | undefined {
+    if (!hass) return {};
+
+    const hassEntities = Object.keys(hass.states);
+    const switches = hassEntities.filter((eid) => eid.split(".")[0] === "switch");
+    const lights = hassEntities.filter((eid) => eid.split(".")[0] === "light");
+
+    if (switches.length > 0) {
+      return { entity: switches[0] };
+    }
+
+    if (lights.length > 0) {
+      return { entity: lights[0] };
+    }
+
+    return { entity: hassEntities[0] };
+  }
+
+  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+    await import("./ui-editor/ui-editor");
+    return document.createElement("homekit-button-editor");
   }
 
   public connectedCallback() {
@@ -48,6 +72,22 @@ export class HomekitButton extends LitElement {
     return this.hass.states[this._config.entity];
   }
 
+  private _isEntityOn(entity: string): boolean {
+    if (!this.hass) {
+      return false;
+    }
+
+    return this.hass.states[entity].state === "on";
+  }
+
+  private _isEntityAvailable(entity: string): boolean {
+    if (!this.hass) {
+      return false;
+    }
+
+    return entity in this.hass.states && this.hass.states[entity].state !== "unavailable" && this.hass.states[entity].state !== "unknown";
+  }
+
   protected render(): TemplateResult {
     if (!this._config || !this.hass) {
       return html``;
@@ -59,12 +99,14 @@ export class HomekitButton extends LitElement {
     const entityName = this._config.name || entityObj.attributes.friendly_name || entityObj.entity_id;
     const entityNameToShow = entityName.charAt(0).toUpperCase() + entityName.slice(1);
     const entityStateToShow = this._config.show_state !== false ? entityObj.state.charAt(0).toUpperCase() + entityObj.state.slice(1) : "";
-    const color =
-      entityObj.state === "on"
-        ? this._config.active_color || "var(--state-light-on-color, var(--state-light-active-color, var(--state-active-color)))"
-        : "var(--state-inactive-color)";
+    const color = this._isEntityOn(this._config.entity)
+      ? this._config.active_color || "var(--state-light-on-color, var(--state-light-active-color, var(--state-active-color)))"
+      : "var(--state-inactive-color)";
 
-    this.style.setProperty("--card-opacity", entityObj.state === "on" ? "1" : "0.5");
+    this.style.setProperty(
+      "--card-opacity",
+      this._isEntityOn(this._config.entity) ? "1" : this._isEntityAvailable(this._config.entity) ? "0.5" : "0.25"
+    );
     this.style.setProperty("--icon-color", color);
 
     return html`

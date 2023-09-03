@@ -3,17 +3,10 @@ import { debounce } from "custom-card-helpers";
 import { version } from "../../package.json";
 
 // Log Version
-console.groupCollapsed(
-  `%c⚡ Homekit Button v${version} is installed`,
-  "color: #488fc2; font-weight: bold"
-);
-console.log("Readme:", "https://github.com/flixlix/power-flow-card-plus");
+console.groupCollapsed(`%c⚡ Homekit Button v${version} is installed`, "color: #488fc2; font-weight: bold");
+console.log("Readme:", "https://github.com/flixlix/homekit-button");
 console.groupEnd();
 
 export const logError = debounce((error: string) => {
-  console.log(
-    `%c⚡ Homekit Button v${version} %cError: ${error}`,
-    "color: #488fc2; font-weight: bold",
-    "color: #b33a3a; font-weight: normal"
-  );
+  console.log(`%c⚡ Homekit Button v${version} %cError: ${error}`, "color: #488fc2; font-weight: bold", "color: #b33a3a; font-weight: normal");
 }, 60000);
