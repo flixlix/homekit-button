@@ -5,6 +5,8 @@ This card focuses on ease of configuration and stability.
 
 To use this card, it is highly recommended to place it inside a grid or stack in order to achieve the sizing to which this card is optimized for.
 
+### 🚨 This card and documentation is still very much a WIP. Check later for installation and usage instructions. ⚠️
+
 ## Example
 
 This code:
