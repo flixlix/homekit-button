@@ -11,14 +11,10 @@ export const cardConfigStruct = assign(
   object({
     entity: optional(string()),
     name: optional(string()),
-    show_name: optional(boolean()),
     icon: optional(string()),
-    show_icon: optional(boolean()),
-    icon_height: optional(string()),
     tap_action: optional(actionConfigStruct),
     hold_action: optional(actionConfigStruct),
-    theme: optional(string()),
-    show_state: optional(boolean()),
+    double_tap_action: optional(actionConfigStruct),
   })
 );
 
@@ -41,29 +37,15 @@ export const configSchema = [
     ],
   },
   {
-    name: "",
-    type: "grid",
-    column_min_width: "100px",
-    schema: [
-      { name: "show_name", selector: { boolean: {} } },
-      { name: "show_state", selector: { boolean: {} } },
-      { name: "show_icon", selector: { boolean: {} } },
-    ],
-  },
-  {
-    name: "",
-    type: "grid",
-    schema: [
-      { name: "icon_height", selector: { text: { suffix: "px" } } },
-      { name: "theme", selector: { theme: {} } },
-    ],
-  },
-  {
     name: "tap_action",
     selector: { "ui-action": {} },
   },
   {
     name: "hold_action",
+    selector: { "ui-action": {} },
+  },
+  {
+    name: "double_tap_action",
     selector: { "ui-action": {} },
   },
 ] as const;
