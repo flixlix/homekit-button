@@ -5,6 +5,8 @@
 
 # Homekit Button 🔘
 
+![Homekit Button](examples/title.gif?raw=true "Homekit Button")
+
 A simple Custom Card for Home Assistant to toggle switches, lights &amp; more!
 This card focuses on ease of configuration and stability.
 
