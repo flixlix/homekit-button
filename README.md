@@ -7,5 +7,4 @@ To use this card, it is highly recommended to place it inside a grid or stack in
 
 ## Example
 
-<img width="508" alt="Screenshot 2023-09-03 at 12 47 31" src="https://github.com/flixlix/homekit-button/assets/61006057/f931f43d-c1e8-48c8-a584-85a62476baf4">
-
+<img width="508" alt="Screenshot 2023-09-03 at 12 47 31" src="examples/01.png">
