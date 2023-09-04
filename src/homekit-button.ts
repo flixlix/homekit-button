@@ -11,6 +11,7 @@ import copy from "fast-copy";
 import { styleMap } from "lit-html/directives/style-map";
 import { actionHandler } from "./action-handler";
 import "./ui-editor/ui-editor";
+import { fireEvent } from "./common/fire-event";
 
 registerCustomCard({
   type: "homekit-button",
@@ -23,6 +24,7 @@ export class HomekitButton extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config = {} as HomekitButtonConfig;
   @queryAsync("mwc-ripple") private _ripple!: Promise<Ripple | null>;
+  @state() _dialogCard;
   setConfig(config: HomekitButtonConfig): void {
     if (!config.entity) {
       throw new Error("Please define at least one entity");
@@ -138,16 +140,17 @@ export class HomekitButton extends LitElement {
             .icon="${entityIcon}"
 
         ></ha-state-icon>
-        <div class="text-container">
-          <div id="name" style="font-size:17px;">
-              ${entityNameToShow}
+          <div class="text-container">
+            <div id="name" style="font-size:17px;">
+                ${entityNameToShow}
+            </div>
+            ${
+              this._config.show_state !== false
+                ? html` <div id="state" style="color:var(--secondary-text-color);font-size:15px;">${entityStateToShow}</div> `
+                : html``
+            }
           </div>
-          ${
-            this._config.show_state !== false
-              ? html` <div id="state" style="color:var(--secondary-text-color);font-size:15px;">${entityStateToShow}</div> `
-              : html``
-          }
-        </div>
+
         </div>
           <mwc-ripple id="ripple"></mwc-ripple>
         </ha-card>
@@ -216,6 +219,20 @@ export class HomekitButton extends LitElement {
           if (!config) return;
           const action = ev.detail.action;
           const localAction = this._evalActions(config, `${action}_action`);
+          if (localAction[action + "_action"]?.action === "open-dialog") {
+            const entityObj = this._getEntityStateObj();
+            const entityName = this._config.name || entityObj.attributes.friendly_name || entityObj.entity_id;
+            const entityNameToShow = entityName.charAt(0).toUpperCase() + entityName.slice(1);
+            fireEvent(this, "show-dialog", {
+              dialogTag: "homekit-buton-dialog",
+              dialogImport: () => import("./dialog/dialog"),
+              dialogParams: {
+                title: entityNameToShow,
+                card: localAction[action + "_action"].card,
+              },
+            });
+            break;
+          }
           handleAction(this, this.hass!, localAction, action);
           break;
         default:

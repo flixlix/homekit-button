@@ -16,4 +16,5 @@ export interface HomekitButtonConfig extends LovelaceCardConfig {
   icon?: string;
   show_state?: boolean;
   active_color?: string;
+  dialog_card?: LovelaceCardConfig;
 }
