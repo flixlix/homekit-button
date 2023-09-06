@@ -1,3 +1,4 @@
+import { LovelaceCardConfig } from "custom-card-helpers";
 import { array, boolean, dynamic, enums, literal, object, optional, string, type, union } from "superstruct";
 
 export interface BaseActionConfig {
@@ -63,8 +64,14 @@ const actionConfigStructCustom = type({
   action: literal("fire-dom-event"),
 });
 
+const actionConfigStructOpenDialog = object({
+  action: literal("open-dialog"),
+  title: optional(string()),
+  card: optional(object()),
+});
+
 export const actionConfigStructType = object({
-  action: enums(["none", "toggle", "more-info", "call-service", "url", "navigate", "assist"]),
+  action: enums(["none", "toggle", "more-info", "call-service", "url", "navigate", "assist", "open-dialog"]),
   confirmation: optional(actionConfigStructConfirmation),
 });
 
@@ -85,6 +92,9 @@ export const actionConfigStruct = dynamic<any>((value) => {
       }
       case "assist": {
         return actionConfigStructAssist;
+      }
+      case "open-dialog": {
+        return actionConfigStructOpenDialog;
       }
     }
   }

@@ -4,6 +4,7 @@ import { fireEvent, HomeAssistant, LovelaceCardEditor } from "custom-card-helper
 import { assert } from "superstruct";
 import { HomekitButtonConfig } from "../homekit-button-config";
 import { cardConfigStruct, configSchema } from "./schema/schema_all";
+import { humanizeString } from "../utils/humanize_string";
 
 export const loadHaForm = async () => {
   if (customElements.get("ha-form")) return;
@@ -51,7 +52,6 @@ export class HomekitButtonEditor extends LitElement implements LovelaceCardEdito
           .schema=${configSchema}
           .computeLabel=${this._computeLabelCallback}
           @value-changed=${this._valueChanged}
-          class="entities-section"
         ></ha-form>
       </div>
     `;

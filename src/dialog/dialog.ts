@@ -11,6 +11,14 @@ declare global {
   }
 }
 
+function provideHass(element) {
+  if (document.querySelector("hc-main")) return (document as any).querySelector("hc-main").provideHass(element);
+
+  if (document.querySelector("home-assistant")) return (document as any).querySelector("home-assistant").provideHass(element);
+
+  return undefined;
+}
+
 @customElement("homekit-buton-dialog")
 export class HomekitButtonDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -61,7 +69,10 @@ export class HomekitButtonDialog extends LitElement {
       return nothing;
     }
 
-    const title = this._params.title || "This is a etststtst";
+    provideHass(this.card); // handle updates in states
+    this.card.hass = this.hass;
+
+    const title = this._params.title;
 
     return html`
       <ha-dialog open @closed=${this.closeDialog} hideActions .heading=${title}>

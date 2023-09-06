@@ -1,9 +1,9 @@
 import { LitElement, PropertyValues, TemplateResult, html } from "lit";
 import { customElement, eventOptions, property, queryAsync, state } from "lit/decorators.js";
 import { registerCustomCard } from "./utils/register-custom-card";
-import { EntityConfig, HomeAssistant, LovelaceCardEditor, handleAction } from "custom-card-helpers";
+import { ActionConfig, EntityConfig, HomeAssistant, LovelaceCardEditor, handleAction } from "custom-card-helpers";
 import { styles } from "./style";
-import { HomekitButtonConfig } from "./homekit-button-config";
+import { HomekitButtonActionConfig, HomekitButtonConfig } from "./homekit-button-config";
 import { HassEntity } from "home-assistant-js-websocket";
 import { Ripple } from "@material/mwc-ripple";
 import { RippleHandlers } from "@material/mwc-ripple/ripple-handlers";
@@ -227,13 +227,24 @@ export class HomekitButton extends LitElement {
               dialogTag: "homekit-buton-dialog",
               dialogImport: () => import("./dialog/dialog"),
               dialogParams: {
-                title: entityNameToShow,
+                title: localAction[action + "_action"].title || entityNameToShow,
                 card: localAction[action + "_action"].card,
               },
             });
             break;
           }
-          handleAction(this, this.hass!, localAction, action);
+          handleAction(
+            this,
+            this.hass!,
+            localAction as {
+              entity?: string;
+              camera_image?: string;
+              hold_action?: ActionConfig;
+              tap_action?: ActionConfig;
+              double_tap_action?: ActionConfig;
+            },
+            action
+          );
           break;
         default:
           break;

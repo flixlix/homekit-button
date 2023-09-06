@@ -18,6 +18,8 @@ export const cardConfigStruct = assign(
   })
 );
 
+const CUSTOM_ACTIONS = ["none", "toggle", "more-info", "call-service", "url", "navigate", "open-dialog"];
+
 export const configSchema = [
   { name: "entity", selector: { entity: {} } },
   {
@@ -38,14 +40,26 @@ export const configSchema = [
   },
   {
     name: "tap_action",
-    selector: { "ui-action": {} },
+    selector: {
+      "ui-action": {
+        actions: CUSTOM_ACTIONS,
+      },
+    },
   },
   {
     name: "hold_action",
-    selector: { "ui-action": {} },
+    selector: {
+      "ui-action": {
+        actions: CUSTOM_ACTIONS,
+      },
+    },
   },
   {
     name: "double_tap_action",
-    selector: { "ui-action": {} },
+    selector: {
+      "ui-action": {
+        actions: CUSTOM_ACTIONS,
+      },
+    },
   },
 ] as const;
