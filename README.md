@@ -6,7 +6,7 @@
 
 ![Homekit Button](examples/title.gif?raw=true "Homekit Button")
 
-A simple Custom Card for Home Assistant to toggle switches, lights &amp; more!
+A simple Custom Card for [Home Assistant](https://www.home-assistant.io) to toggle switches, lights &amp; more!
 This card focuses on ease of configuration and stability.
 
 To use this card, it is highly recommended to place it inside a grid or stack in order to achieve the sizing to which this card is optimized for.
