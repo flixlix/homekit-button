@@ -261,3 +261,17 @@ Note that this card has both secondary fields, one on the top and one on the bot
 ### Bottom Right Card - Custom State Label
 
 This card has a custom state label, which is an `input_text` that is updated by an automation. The state label is shown as `Custom label (❄️)`, which is the humanized version of the state.
+
+## Contributing
+
+If you have any ideas for new features, or find any bugs, feel free to open an issue or a pull request!
+
+This card is developed using [Visual Studio Code](https://code.visualstudio.com) with [devcontainer](https://code.visualstudio.com/docs/remote/containers) support.
+To get started, simply open the project in VSCode and run the "Reopen in Container" command.
+This will automatically start a Home Assistant instance with the card installed and ready to be used.
+In a browser, navigate to `http://localhost:9123` to access the Home Assistant instance.
+You can now start developing!
+
+## Support
+
+If you like my work, consider supporting me on [Ko-Fi](https://ko-fi.com/flixlix)! 🥰
