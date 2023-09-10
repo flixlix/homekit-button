@@ -35,13 +35,12 @@ export declare type HomekitButtonActionConfig =
 
 export interface HomekitButtonConfig extends LovelaceCardConfig {
   entity: string;
-  title?: string;
-  tap_action?: HomekitButtonActionConfig;
-  hold_action?: HomekitButtonActionConfig;
-  double_tap_action?: HomekitButtonActionConfig;
   name?: string;
   icon?: string;
   show_state?: boolean;
   active_color?: string;
-  dialog_card?: LovelaceCardConfig;
+  tap_action?: HomekitButtonActionConfig;
+  hold_action?: HomekitButtonActionConfig;
+  double_tap_action?: HomekitButtonActionConfig;
+  title?: string;
 }
