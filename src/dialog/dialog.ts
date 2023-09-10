@@ -15,7 +15,6 @@ function provideHass(element) {
   if (document.querySelector("hc-main")) return (document as any).querySelector("hc-main").provideHass(element);
 
   if (document.querySelector("home-assistant")) return (document as any).querySelector("home-assistant").provideHass(element);
-
   return undefined;
 }
 
@@ -32,7 +31,7 @@ export class HomekitButtonDialog extends LitElement {
     }
     const helpers = await (window as CustomWindow).loadCardHelpers?.();
     this.card = await helpers.createCardElement(this._card);
-    this.card.hass = this.hass;
+    provideHass(this.card); // handle updates in states
     this.requestUpdate();
   }
 
@@ -49,7 +48,6 @@ export class HomekitButtonDialog extends LitElement {
 
   public closeDialog(): void {
     this._params = undefined;
-    fireEvent(this, "dialog-closed", { dialog: this.localName });
   }
 
   protected firstUpdated(changedProps) {
@@ -65,24 +63,16 @@ export class HomekitButtonDialog extends LitElement {
   }
 
   protected render() {
-    if (!this._params) {
+    if (!this._params || !this.card || !this.hass) {
       return nothing;
     }
-
-    provideHass(this.card); // handle updates in states
-    this.card.hass = this.hass;
 
     const title = this._params.title;
 
     return html`
       <ha-dialog open @closed=${this.closeDialog} hideActions .heading=${title}>
         <ha-dialog-header class="header-bar" slot="heading">
-          <ha-icon-button
-            slot="navigationIcon"
-            dialogAction="cancel"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+          <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}></ha-icon-button>
           <span slot="title" class="header-title" .title=${title}>${title}</span>
         </ha-dialog-header>
         <div>${this.card}</div>

@@ -229,6 +229,7 @@ export class HomekitButton extends LitElement {
               dialogParams: {
                 title: localAction[action + "_action"].title || entityNameToShow,
                 card: localAction[action + "_action"].card,
+                hass: this.hass,
               },
             });
             break;
