@@ -29,6 +29,12 @@ To use this card, it is highly recommended to place it inside a grid or stack in
 5. Under "Category", select "Frontend"
 6. The card should now be found and able to be easily installed through the UI 🥳
 
+## UI Editor
+
+This card features a fully featured UI Editor (except [`open-dialog` action](#open-dialog-action)), so in most cases you won't need to edit any YAML.
+
+![UI Editor](examples/ui-editor.png?raw=true "UI Editor")
+
 ## Configuration
 
 To start using this card, you can simply create a new Card in your Lovelace dashboard and select "HomeKit Button" in the card type picker.
@@ -70,6 +76,8 @@ The action object is a simple object that can be used to call different actions 
 The `open-dialog` action is a special action, exclusive to this card. It allows you to open a dialog with a custom card inside of it. This can be used to show a more detailed view of the entity, or to show a different card when tapping the button.
 
 When using this action, the `card` option is required. The Header of the Dialog uses the optional `title` option, and will default to the `name` of the entity.
+
+Note that this option is only available when using the YAML configuration.
 
 ### Secondary Configuration
 
