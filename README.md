@@ -119,7 +119,7 @@ cards:
 
 Should give you something like this:
 
-![Basic Example](examples/01.png?raw=true "Basic Example")
+![Basic Example](examples/simple.png?raw=true "Basic Example")
 
 ## Using Open Dialog Action
 
@@ -147,3 +147,109 @@ cards:
 Should not differ from the previous example, but when tapping the last card, it should open a dialog with the entities inside of it.
 
 ![Open Dialog Example](examples/open-dialog-action.png?raw=true "Open Dialog Example")
+
+## Advanced Example
+
+This code:
+
+```yaml
+square: false
+columns: 3
+type: grid
+title: Homekit Button
+cards:
+  - type: custom:homekit-button
+    entity: switch.acj
+    name: Homekit Button
+    icon: mdi:radiobox-marked
+    tap_action:
+      action: toggle
+  - type: custom:homekit-button
+    entity: switch.skylight
+    icon: mdi:window-open-variant
+    tap_action:
+      action: open-dialog
+      title: My Custom Dialog
+      card:
+        type: custom:homekit-button
+        entity: switch.skylight
+        icon: mdi:window-open-variant
+        tap_action:
+          action: toggle
+  - type: custom:homekit-button
+    entity: light.bed_light
+    icon: mdi:lightbulb
+    show_state: false
+    tap_action:
+      action: toggle
+  - type: custom:homekit-button
+    entity: switch.computer
+    tap_action:
+      action: toggle
+    hold_action:
+      action: toggle
+    icon: mdi:chip
+    name: Computer
+    show_state: false
+    secondary:
+      top:
+        entity: sensor.cpu_percent
+  - type: custom:homekit-button
+    entity: switch.heat_pump
+    tap_action:
+      action: toggle
+    hold_action:
+      action: toggle
+    icon: mdi:water-boiler
+    name: Heat Pump
+    secondary:
+      top:
+        entity: number.temperature_setting
+        tap_action:
+          action: open-dialog
+          card:
+            type: custom:homekit-button
+            entity: light.bed_light
+            icon: mdi:lightbulb
+            show_state: false
+            tap_action:
+              action: toggle
+      bottom:
+        entity: sensor.outside_temperature
+        icon: mdi:thermometer-chevron-up
+  - type: custom:homekit-button
+    entity: light.ceiling_lights
+    icon: mdi:light-recessed
+    state_label:
+      entity: input_text.custom_label
+    tap_action:
+      action: toggle
+```
+
+Should give you something like this:
+
+![Advanced Example](examples/advanced.png?raw=true "Advanced Example")
+
+### Top Left Card - Card Not in HA
+
+This card is how the card looks when the entity is not even in your Home Assistant instance. This is to prevent the card from breaking when the entity is not available.
+
+### Top Middle Card - Normal `off` State & Open Dialog Action
+
+This card is how the card looks when the entity is in its `off` state. The icon is greyed out, and the state is shown as `Off`. Also note that this card has the tap_action set to `open-dialog`, which opens a dialog with, in this case, the same card inside of it.
+
+### Top Right Card - State Hidden
+
+This card is how the card looks when the `show_state` option is set to `false` and the entity is off. The icon is still greyed out, but the state is not shown.
+
+### Bottom Left Card - `on` State with State hidden and Top Secondary
+
+This card is how the card looks when the entity is in its `on` state, and the `show_state` option is set to `false`. The icon is shown as active, but the state is not shown. Also note that this card has a secondary field on the top, which shows the current CPU usage.
+
+### Bottom Middle Card - Both Secondaries
+
+Note that this card has both secondary fields, one on the top and one on the bottom. The Bottom secondary field also has a custom icon.
+
+### Bottom Right Card - Custom State Label
+
+This card has a custom state label, which is an `input_text` that is updated by an automation. The state label is shown as `Custom label (❄️)`, which is the humanized version of the state.
