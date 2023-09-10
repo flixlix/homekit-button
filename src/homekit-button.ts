@@ -3,7 +3,7 @@ import { customElement, eventOptions, property, queryAsync, state } from "lit/de
 import { registerCustomCard } from "./utils/register-custom-card";
 import { ActionConfig, EntityConfig, HomeAssistant, LovelaceCardEditor, handleAction } from "custom-card-helpers";
 import { styles } from "./style";
-import { HomekitButtonActionConfig, HomekitButtonConfig } from "./homekit-button-config";
+import { HomekitButtonActionConfig, HomekitButtonConfig, SecondaryField } from "./homekit-button-config";
 import { HassEntity } from "home-assistant-js-websocket";
 import { Ripple } from "@material/mwc-ripple";
 import { RippleHandlers } from "@material/mwc-ripple/ripple-handlers";
@@ -12,6 +12,12 @@ import { styleMap } from "lit-html/directives/style-map";
 import { actionHandler } from "./action-handler";
 import "./ui-editor/ui-editor";
 import { fireEvent } from "./common/fire-event";
+import { humanizeString } from "./utils/humanize_string";
+import { getEntityStateObj } from "./utils/ha/getEntityStateObj";
+import { isEntityOn } from "./utils/ha/isEntityOn";
+import { isEntityAvailable } from "./utils/ha/isEntityAvailable";
+import { getFriendlyEntityState } from "./utils/ha/getFriendlyEntityState";
+import { doesEntityExist } from "./utils/ha/doesEntityExist";
 
 registerCustomCard({
   type: "homekit-button",
@@ -23,6 +29,7 @@ registerCustomCard({
 export class HomekitButton extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config = {} as HomekitButtonConfig;
+  @state() private _secondaryClicked = false;
   @queryAsync("mwc-ripple") private _ripple!: Promise<Ripple | null>;
   @state() _dialogCard;
   setConfig(config: HomekitButtonConfig): void {
@@ -67,70 +74,77 @@ export class HomekitButton extends LitElement {
     return 2;
   }
 
-  private _getEntityStateObj(): HassEntity {
-    if (!this._config || !this.hass) {
-      return {} as HassEntity;
-    }
-    if (!this._doesEntityExist(this._config.entity)) {
-      return {
-        entity_id: this._config.entity,
-        state: "unavailable",
-        attributes: {},
-      } as HassEntity;
-    }
-    return this.hass.states[this._config.entity];
-  }
-
-  private _isEntityOn(entity: string): boolean {
-    if (!this.hass) {
-      return false;
-    }
-
-    return this.hass.states[entity]?.state === "on";
-  }
-
-  private _isEntityAvailable(entity: string): boolean {
-    if (!this.hass) {
-      return false;
-    }
-
-    return entity in this.hass.states && this.hass.states[entity].state !== "unavailable" && this.hass.states[entity].state !== "unknown";
-  }
-
-  private _doesEntityExist(entity: string): boolean {
-    if (!this.hass) {
-      return false;
-    }
-
-    return entity in this.hass.states;
-  }
-
   protected render(): TemplateResult {
     if (!this._config || !this.hass) {
       return html``;
     }
 
-    const entityObj = this._getEntityStateObj();
+    const handleMainAction = (ev: any) => {
+      if (!!this._secondaryClicked) return; // Avoid two actions at the same time
+      if (!doesEntityExist(this.hass, this._config.entity)) return; // Avoid actions when entity does not exist
+      this._handleAction(ev);
+    };
+
+    const entityObj = getEntityStateObj(this.hass, this._config.entity);
     const entityDomain = entityObj.entity_id.split(".")[0];
     const entityIcon = this._config.icon || entityObj?.attributes?.icon || "mdi:flash";
     const entityName = this._config.name || entityObj?.attributes?.friendly_name || entityObj.entity_id;
-    const entityNameToShow = entityName.charAt(0).toUpperCase() + entityName.slice(1);
-    const entityStateToShow = this._config.show_state !== false ? entityObj?.state.charAt(0).toUpperCase() + entityObj?.state.slice(1) : "";
-    const color = this._isEntityOn(this._config.entity)
+    const entityNameToShow = humanizeString(entityName);
+
+    const entityOn = isEntityOn(this.hass, this._config.entity);
+    const entityAvailable = isEntityAvailable(this.hass, this._config.entity);
+
+    const color = entityOn
       ? this._config.active_color || "var(--state-light-on-color, var(--state-light-active-color, var(--state-active-color)))"
       : "var(--state-inactive-color)";
 
-    this.style.setProperty(
-      "--card-opacity",
-      this._isEntityOn(this._config.entity) ? "1" : this._isEntityAvailable(this._config.entity) ? "0.5" : "0.25"
-    );
+    this.style.setProperty("--card-opacity", entityOn ? "1" : entityAvailable ? "0.5" : "0.25");
     this.style.setProperty("--icon-color", color);
+
+    const getSecondaryStateToShow = (fieldName: "top" | "bottom") => {
+      const field = this._config.secondary?.[fieldName];
+      if (!field) return "";
+      return getFriendlyEntityState(this.hass, field.entity, {
+        showUnit: field.show_unit !== false,
+      });
+    };
+
+    const secondaryElement = (fieldName: "top" | "bottom") => {
+      const field = this._config.secondary?.[fieldName];
+      if (!field || !field?.entity) return html``;
+      const handleClick = (ev: any) => {
+        this._secondaryClicked = true;
+        this._handleAction(ev, field);
+        setTimeout(() => {
+          this._secondaryClicked = false;
+        }); // Avoid setting false directly
+      };
+      const icon = field.icon ? html` <ha-icon class="secondary-icon" id="icon" .icon="${field.icon}"></ha-icon> ` : html``;
+      return html` <p class=${`secondary-text-` + fieldName} @action=${handleClick}>${icon}${getSecondaryStateToShow(fieldName)}</p> `;
+    };
+
+    const stateElement = () => {
+      if (this._config.show_state === false) return html``;
+
+      let label = "";
+
+      if (this._config?.state_label?.entity) {
+        const humanize = this._config?.state_label?.humanize !== false;
+        const humanizedState = getFriendlyEntityState(this.hass, this._config.state_label.entity, {
+          showUnit: false,
+        });
+        label = humanize ? humanizedState : getEntityStateObj(this.hass, this._config.state_label.entity)?.state;
+      } else {
+        label = getFriendlyEntityState(this.hass, this._config.entity);
+      }
+      return html` <p id="state">${label}</p> `;
+    };
 
     return html`
       <ha-card
         .header=${this._config.title}
         class="homekit-button-main"
-        @action=${this._handleAction}
+        @action=${handleMainAction}
         @focus="${this.handleRippleFocus}"
         @blur="${this.handleRippleBlur}"
         @mousedown="${this.handleRippleActivate}"
@@ -146,24 +160,25 @@ export class HomekitButton extends LitElement {
         .config="${this._config}"
       >
         <div class="card-content">
-        <ha-state-icon
-            class="icon"
-            id="icon"
-            .state=${entityObj}
-            ?data-domain=${entityDomain}
-            data-state=${entityObj.state}
-            .icon="${entityIcon}"
-
-        ></ha-state-icon>
+          <ha-state-icon
+              class="icon"
+              id="icon"
+              .state=${entityObj}
+              ?data-domain=${entityDomain}
+              data-state=${entityObj.state}
+              .icon="${entityIcon}"
+          ></ha-state-icon>
           <div class="text-container">
-            <div id="name" style="font-size:17px;">
+            <div class="top-container">
+              <p id="name">
                 ${entityNameToShow}
+              </p>
+              ${secondaryElement("top")}
             </div>
-            ${
-              this._config.show_state !== false
-                ? html` <div id="state" style="color:var(--secondary-text-color);font-size:15px;">${entityStateToShow}</div> `
-                : html``
-            }
+            <div class="bottom-container">
+              ${stateElement()}
+              ${secondaryElement("bottom")}
+          </div>
           </div>
 
         </div>
@@ -173,7 +188,7 @@ export class HomekitButton extends LitElement {
     `;
   }
 
-  private _evalActions(config: HomekitButtonConfig, action: string): HomekitButtonConfig {
+  private _evalActions(config: HomekitButtonConfig | SecondaryField, action: string): HomekitButtonConfig | SecondaryField {
     const configDuplicate = copy(config);
     /* eslint no-param-reassign: 0 */
     const __evalObject = (configEval: any): any => {
@@ -224,20 +239,19 @@ export class HomekitButton extends LitElement {
     this._ripple.then((r) => r && typeof r.endFocus === "function" && this._rippleHandlers.endFocus());
   }
 
-  private _handleAction(ev: any): void {
-    if (!this._doesEntityExist(this._config.entity)) return;
+  private _handleAction(ev: any, configLocation: HomekitButtonConfig | SecondaryField = this._config): void {
     if (ev.detail?.action) {
       switch (ev.detail.action) {
         case "tap":
         case "hold":
         case "double_tap":
-          const config = this._config;
+          const config = configLocation;
           if (!config) return;
           const action = ev.detail.action;
           const localAction = this._evalActions(config, `${action}_action`);
           if (localAction[action + "_action"]?.action === "open-dialog") {
-            const entityObj = this._getEntityStateObj();
-            const entityName = this._config.name || entityObj.attributes.friendly_name || entityObj.entity_id;
+            const entityObj = getEntityStateObj(this.hass, configLocation.entity);
+            const entityName = configLocation?.name || entityObj.attributes.friendly_name || entityObj.entity_id;
             const entityNameToShow = entityName.charAt(0).toUpperCase() + entityName.slice(1);
             fireEvent(this, "show-dialog", {
               dialogTag: "homekit-buton-dialog",

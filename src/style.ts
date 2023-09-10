@@ -34,14 +34,55 @@ export const styles = css`
     height: 45%;
   }
 
-  .text-container {
-    padding: 0 0.75rem;
-    max-width: 100%;
-  }
-
-  #name {
+  p {
+    margin: 0;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  #name {
+    font-size: 17px;
+  }
+
+  #state {
+    color: var(--secondary-text-color);
+    font-size: 15px;
+  }
+
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.25rem;
+  }
+
+  .text-container > * {
+    padding: 0 0.75rem;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .secondary-text {
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .secondary-icon {
+    --mdc-icon-size: 14px;
+  }
+
+  .secondary-text-bottom {
+    color: var(--secondary-text-color);
   }
 `;
