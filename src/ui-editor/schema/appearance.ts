@@ -4,7 +4,7 @@ export const appearanceSchema = {
   title: "Appearance",
   name: "",
   type: "expandable",
-  iconPath: mdiPalette,
+  icon: "mdi:palette",
   schema: [
     { name: "name", selector: { text: {} } },
     { name: "icon", selector: { icon: {} } },

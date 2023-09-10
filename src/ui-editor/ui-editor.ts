@@ -50,7 +50,7 @@ export class HomekitButtonEditor extends LitElement implements LovelaceCardEdito
         <ha-form
           .hass=${this.hass}
           .data=${data}
-          .schema=${configSchema}
+          .schema=${configSchema(data)}
           .computeLabel=${this._computeLabelCallback}
           @value-changed=${this._valueChanged}
         ></ha-form>

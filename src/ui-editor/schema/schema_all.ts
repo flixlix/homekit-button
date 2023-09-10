@@ -4,6 +4,10 @@ import { secondarySchema } from "./secondary";
 import { actionsSchema } from "./actions";
 import { stateLabelSchema } from "./stateLabel";
 import { appearanceSchema } from "./appearance";
+import { HomekitButtonConfig } from "../../homekit-button-config";
+import { HomeAssistant } from "custom-card-helpers";
+import memoizeOne from "memoize-one";
+import { hasField } from "../utils/hasField";
 
 const baseLovelaceCardConfig = object({
   type: string(),
@@ -12,15 +16,17 @@ const baseLovelaceCardConfig = object({
   index: optional(integer()),
 });
 
-const secondaryFieldStruct = object({
-  entity: string(),
-  name: optional(string()),
-  icon: optional(string()),
-  show_unit: optional(boolean()),
-  tap_action: optional(actionConfigStruct),
-  hold_action: optional(actionConfigStruct),
-  double_tap_action: optional(actionConfigStruct),
-});
+const secondaryFieldStruct = optional(
+  object({
+    entity: string(),
+    name: optional(string()),
+    icon: optional(string()),
+    show_unit: optional(boolean()),
+    tap_action: optional(actionConfigStruct),
+    hold_action: optional(actionConfigStruct),
+    double_tap_action: optional(actionConfigStruct),
+  })
+);
 
 export const cardConfigStruct = assign(
   baseLovelaceCardConfig,
@@ -49,4 +55,10 @@ export const cardConfigStruct = assign(
   })
 );
 
-export const configSchema = [{ name: "entity", selector: { entity: {} } }, appearanceSchema, actionsSchema, secondarySchema, stateLabelSchema] as const;
+const expandablesSchema = (config: HomekitButtonConfig) => [appearanceSchema, actionsSchema, secondarySchema(config), stateLabelSchema];
+
+const conditionalSchema = (config: HomekitButtonConfig) => (hasField(config) ? ([...expandablesSchema(config)] as const) : []);
+
+export const configSchema = memoizeOne(
+  (config: HomekitButtonConfig) => [{ name: "entity", selector: { entity: {} } }, ...conditionalSchema(config)] as const
+);
