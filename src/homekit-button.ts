@@ -41,20 +41,23 @@ export class HomekitButton extends LitElement {
 
   static getStubConfig(hass: HomeAssistant): object | undefined {
     if (!hass) return {};
-
+    const DEFAULT_CONFIG = {
+      entity: "",
+      show_state: true,
+    };
     const hassEntities = Object.keys(hass.states);
     const switches = hassEntities.filter((eid) => eid.split(".")[0] === "switch");
     const lights = hassEntities.filter((eid) => eid.split(".")[0] === "light");
 
     if (switches.length > 0) {
-      return { entity: switches[0] };
+      return { ...DEFAULT_CONFIG, entity: switches[0] };
     }
 
     if (lights.length > 0) {
-      return { entity: lights[0] };
+      return { ...DEFAULT_CONFIG, entity: lights[0] };
     }
 
-    return { entity: hassEntities[0] };
+    return { ...DEFAULT_CONFIG, entity: hassEntities[0] };
   }
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
