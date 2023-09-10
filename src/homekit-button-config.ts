@@ -11,9 +11,10 @@ import {
 } from "custom-card-helpers";
 
 interface LovelaceCardConfig {
-  index?: number;
-  view_index?: number;
   type: string;
+  view_index?: number;
+  view_layout?: string;
+  index?: number;
 }
 
 interface OpenDialogActionConfig extends BaseActionConfig {
