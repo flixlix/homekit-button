@@ -1,6 +1,6 @@
 {
   "name": "homekit-button",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple homekit-inspired Custom Card for Home Assistant to toggle switches, lights & more!",
   "main": "homekit-button.js",
   "keywords": [

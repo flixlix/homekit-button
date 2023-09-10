@@ -75,7 +75,7 @@ export class HomekitButtonDialog extends LitElement {
           <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}></ha-icon-button>
           <span slot="title" class="header-title" .title=${title}>${title}</span>
         </ha-dialog-header>
-        <div>${this.card}</div>
+        <div class="content-container">${this.card}</div>
       </ha-dialog>
     `;
   }
@@ -93,6 +93,7 @@ export class HomekitButtonDialog extends LitElement {
         flex-direction: row;
         align-items: flex-start;
         padding: 4px;
+        padding-bottom: 0px;
         box-sizing: border-box;
       }
       .header-title {
@@ -109,6 +110,7 @@ export class HomekitButtonDialog extends LitElement {
       @media all and (min-width: 450px) and (min-height: 500px) {
         .header-bar {
           padding: 12px;
+          padding-bottom: 0px;
         }
       }
       .header-navigation-icon {
@@ -117,6 +119,15 @@ export class HomekitButtonDialog extends LitElement {
         height: 100%;
         display: flex;
         flex-direction: row;
+      }
+
+      ha-dialog {
+        --dialog-content-padding: 0px;
+        --mdc-dialog-min-width: 400px;
+      }
+
+      .content-container {
+        margin: 0px 24px 24px;
       }
     `,
   ];
