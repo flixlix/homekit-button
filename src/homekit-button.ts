@@ -71,6 +71,13 @@ export class HomekitButton extends LitElement {
     if (!this._config || !this.hass) {
       return {} as HassEntity;
     }
+    if (!this._doesEntityExist(this._config.entity)) {
+      return {
+        entity_id: this._config.entity,
+        state: "unavailable",
+        attributes: {},
+      } as HassEntity;
+    }
     return this.hass.states[this._config.entity];
   }
 
@@ -79,7 +86,7 @@ export class HomekitButton extends LitElement {
       return false;
     }
 
-    return this.hass.states[entity].state === "on";
+    return this.hass.states[entity]?.state === "on";
   }
 
   private _isEntityAvailable(entity: string): boolean {
@@ -90,6 +97,14 @@ export class HomekitButton extends LitElement {
     return entity in this.hass.states && this.hass.states[entity].state !== "unavailable" && this.hass.states[entity].state !== "unknown";
   }
 
+  private _doesEntityExist(entity: string): boolean {
+    if (!this.hass) {
+      return false;
+    }
+
+    return entity in this.hass.states;
+  }
+
   protected render(): TemplateResult {
     if (!this._config || !this.hass) {
       return html``;
@@ -97,10 +112,10 @@ export class HomekitButton extends LitElement {
 
     const entityObj = this._getEntityStateObj();
     const entityDomain = entityObj.entity_id.split(".")[0];
-    const entityIcon = this._config.icon || entityObj.attributes.icon || "mdi:flash";
-    const entityName = this._config.name || entityObj.attributes.friendly_name || entityObj.entity_id;
+    const entityIcon = this._config.icon || entityObj?.attributes?.icon || "mdi:flash";
+    const entityName = this._config.name || entityObj?.attributes?.friendly_name || entityObj.entity_id;
     const entityNameToShow = entityName.charAt(0).toUpperCase() + entityName.slice(1);
-    const entityStateToShow = this._config.show_state !== false ? entityObj.state.charAt(0).toUpperCase() + entityObj.state.slice(1) : "";
+    const entityStateToShow = this._config.show_state !== false ? entityObj?.state.charAt(0).toUpperCase() + entityObj?.state.slice(1) : "";
     const color = this._isEntityOn(this._config.entity)
       ? this._config.active_color || "var(--state-light-on-color, var(--state-light-active-color, var(--state-active-color)))"
       : "var(--state-inactive-color)";
@@ -210,6 +225,7 @@ export class HomekitButton extends LitElement {
   }
 
   private _handleAction(ev: any): void {
+    if (!this._doesEntityExist(this._config.entity)) return;
     if (ev.detail?.action) {
       switch (ev.detail.action) {
         case "tap":
