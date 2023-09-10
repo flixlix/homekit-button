@@ -1,9 +1,25 @@
 import { any, assign, boolean, integer, number, object, optional, record, string } from "superstruct";
-import { actionConfigStruct } from "./action";
+import { actionConfigStruct } from "./actionStruct";
+import { secondarySchema } from "./secondary";
+import { actionsSchema } from "./actions";
+import { stateLabelSchema } from "./stateLabel";
+import { appearanceSchema } from "./appearance";
 
 const baseLovelaceCardConfig = object({
   type: string(),
+  view_index: optional(integer()),
   view_layout: any(),
+  index: optional(integer()),
+});
+
+const secondaryFieldStruct = object({
+  entity: string(),
+  name: optional(string()),
+  icon: optional(string()),
+  show_unit: optional(boolean()),
+  tap_action: optional(actionConfigStruct),
+  hold_action: optional(actionConfigStruct),
+  double_tap_action: optional(actionConfigStruct),
 });
 
 export const cardConfigStruct = assign(
@@ -12,54 +28,25 @@ export const cardConfigStruct = assign(
     entity: optional(string()),
     name: optional(string()),
     icon: optional(string()),
+    show_state: optional(boolean()),
+    active_color: optional(string()),
+    title: optional(string()),
+    secondary: optional(
+      object({
+        top: secondaryFieldStruct,
+        bottom: secondaryFieldStruct,
+      })
+    ),
+    state_label: optional(
+      object({
+        entity: string(),
+        humanize: optional(boolean()),
+      })
+    ),
     tap_action: optional(actionConfigStruct),
     hold_action: optional(actionConfigStruct),
     double_tap_action: optional(actionConfigStruct),
   })
 );
 
-const CUSTOM_ACTIONS = ["none", "toggle", "more-info", "call-service", "url", "navigate", "open-dialog"];
-
-export const configSchema = [
-  { name: "entity", selector: { entity: {} } },
-  {
-    name: "",
-    type: "grid",
-    schema: [
-      { name: "name", selector: { text: {} } },
-      {
-        name: "icon",
-        selector: {
-          icon: {},
-        },
-        context: {
-          icon_entity: "entity",
-        },
-      },
-    ],
-  },
-  {
-    name: "tap_action",
-    selector: {
-      "ui-action": {
-        actions: CUSTOM_ACTIONS,
-      },
-    },
-  },
-  {
-    name: "hold_action",
-    selector: {
-      "ui-action": {
-        actions: CUSTOM_ACTIONS,
-      },
-    },
-  },
-  {
-    name: "double_tap_action",
-    selector: {
-      "ui-action": {
-        actions: CUSTOM_ACTIONS,
-      },
-    },
-  },
-] as const;
+export const configSchema = [{ name: "entity", selector: { entity: {} } }, appearanceSchema, actionsSchema, secondarySchema, stateLabelSchema] as const;

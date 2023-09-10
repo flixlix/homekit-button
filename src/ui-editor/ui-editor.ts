@@ -5,6 +5,7 @@ import { assert } from "superstruct";
 import { HomekitButtonConfig } from "../homekit-button-config";
 import { cardConfigStruct, configSchema } from "./schema/schema_all";
 import { humanizeString } from "../utils/humanize_string";
+import { mdiPencil } from "@mdi/js";
 
 export const loadHaForm = async () => {
   if (customElements.get("ha-form")) return;
@@ -64,7 +65,8 @@ export class HomekitButtonEditor extends LitElement implements LovelaceCardEdito
     fireEvent(this, "config-changed", { config });
   }
 
-  private _computeLabelCallback = (schema: any) => this.hass!.localize(`ui.panel.lovelace.editor.card.generic.${schema?.name}`);
+  private _computeLabelCallback = (schema: any) =>
+    this.hass!.localize(`ui.panel.lovelace.editor.card.generic.${schema?.name}`) || humanizeString(schema?.name);
 
   static get styles() {
     return css`
